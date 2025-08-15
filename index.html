@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIT Patna CSDA Launchpad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Focus -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive dashboard. The core structure avoids a linear report format in favor of a user-centric, task-oriented layout. The main sections are: 1) A 'Dashboard' for a high-level overview with a Chart.js visualization of time allocation. 2) An 'Interactive 3-Day Plan' that allows users to filter the schedule by day, focusing on immediate tasks. 3) A 'Subject Deep Dive' section using tabs to present detailed prerequisite information for each course without overwhelming the user. 4) A 'Strategy & Mindset' section for the narrative advice. This structure was chosen to break down the dense information into manageable, interactive components, directly supporting the user's goal of preparing efficiently. -->
+    <!-- Visualization & Content Choices: 1. Report Info: 20-Hour Time Allocation. Goal: Compare/Inform. Viz: Donut Chart. Interaction: Hover for details. Justification: Visually engaging way to show proportions. Library: Chart.js. 2. Report Info: 3-Day Schedule. Goal: Organize/Guide. Viz: Interactive Cards. Interaction: JS-powered buttons to filter by day. Justification: Focuses user on actionable daily tasks. Library: Vanilla JS. 3. Report Info: Subject Details. Goal: Detail/Inform. Viz: Tabbed Content. Interaction: Click tabs to switch content. Justification: Prevents information overload. Library: Vanilla JS. 4. Report Info: Strategy Advice. Goal: Motivate. Viz: Styled text blocks with Unicode icons. Interaction: Minimal hover effects. Justification: Best for narrative content. Library: HTML/Tailwind. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .tab-active {
+            background-color: #8D7B68;
+            color: #FDFBF8;
+            font-weight: 600;
+        }
+        .tab-inactive {
+            background-color: #EAE3D9;
+            color: #8D7B68;
+        }
+        .day-btn-active {
+            background-color: #A4907C;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .day-btn-inactive {
+            background-color: #EAE3D9;
+            color: #8D7B68;
+        }
+        .card-enter {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#6F6051] mb-2">Your IIT Patna CSDA Launchpad</h1>
+            <p class="text-lg md:text-xl text-[#8D7B68]">A 3-day, 20-hour strategic plan to conquer your first semester and target a 9.5 CGPA.</p>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="mb-16 p-6 md:p-8 bg-white rounded-2xl shadow-lg">
+                <h2 class="text-3xl font-bold text-[#6F6051] mb-2 text-center">High-Impact Study Blueprint</h2>
+                <p class="text-center text-[#8D7B68] max-w-3xl mx-auto mb-8">
+                    This plan strategically allocates your 20 hours to the subjects that form the foundational pillars of the CSDA program: Mathematics and Computer Science. The goal is to build two mutually reinforcing pillars of knowledge, giving you the strongest possible start.
+                </p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="chart-container">
+                        <canvas id="allocationChart"></canvas>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-[#FDFBF8] p-4 rounded-lg">
+                            <h3 class="font-bold text-lg text-[#6F6051]">🎯 The Goal: High-Leverage Learning</h3>
+                            <p class="text-[#8D7B68]">Focus your effort on prerequisites that unlock the most significant portion of your first-semester curriculum. This plan is designed to maximize the impact of every hour you invest.</p>
+                        </div>
+                        <div class="bg-[#FDFBF8] p-4 rounded-lg">
+                            <h3 class="font-bold text-lg text-[#6F6051]">🤝 Symbiotic Skills</h3>
+                            <p class="text-[#8D7B68]">Mastering Python in your CS course will directly help you simulate and understand complex probability concepts in Mathematics. This synergy is key to efficient learning.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3-Day Plan Section -->
+            <section id="plan" class="mb-16 p-6 md:p-8 bg-white rounded-2xl shadow-lg">
+                 <h2 class="text-3xl font-bold text-[#6F6051] mb-2 text-center">Your 3-Day Tactical Schedule</h2>
+                <p class="text-center text-[#8D7B68] max-w-3xl mx-auto mb-8">
+                    This is your concrete, hour-by-hour action plan for August 15th-17th. It's designed to maximize focus and eliminate the guesswork. Select a day to see your tasks.
+                </p>
+                <div class="flex justify-center space-x-2 md:space-x-4 mb-8">
+                    <button class="day-btn px-4 py-2 rounded-lg font-semibold transition-all duration-300" data-day="1">Day 1</button>
+                    <button class="day-btn px-4 py-2 rounded-lg font-semibold transition-all duration-300" data-day="2">Day 2</button>
+                    <button class="day-btn px-4 py-2 rounded-lg font-semibold transition-all duration-300" data-day="3">Day 3</button>
+                </div>
+                <div id="scheduleContainer" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Schedule cards will be injected here by JS -->
+                </div>
+            </section>
+
+            <!-- Subject Deep Dive Section -->
+            <section id="subjects" class="mb-16 p-6 md:p-8 bg-white rounded-2xl shadow-lg">
+                <h2 class="text-3xl font-bold text-[#6F6051] mb-2 text-center">Subject-Specific Prerequisite Deep Dive</h2>
+                 <p class="text-center text-[#8D7B68] max-w-3xl mx-auto mb-8">
+                    Here is a granular, actionable plan for each course. Click on a subject to view the curated resources and specific learning goals to bridge any foundational gaps.
+                </p>
+                <div class="flex flex-wrap justify-center gap-2 mb-8">
+                    <button class="subject-tab px-4 py-2 rounded-lg font-medium transition-colors duration-300" data-subject="math">🧮 Mathematics-1</button>
+                    <button class="subject-tab px-4 py-2 rounded-lg font-medium transition-colors duration-300" data-subject="cs">💻 Foundations of CS</button>
+                    <button class="subject-tab px-4 py-2 rounded-lg font-medium transition-colors duration-300" data-subject="da">📊 Data Analytics</button>
+                    <button class="subject-tab px-4 py-2 rounded-lg font-medium transition-colors duration-300" data-subject="eng">✍️ English</button>
+                </div>
+                <div id="subjectContent" class="bg-[#FDFBF8] p-6 rounded-lg min-h-[300px]">
+                    <!-- Subject content will be injected here by JS -->
+                </div>
+            </section>
+            
+            <!-- Strategy Section -->
+            <section id="strategy" class="p-6 md:p-8 bg-white rounded-2xl shadow-lg">
+                <h2 class="text-3xl font-bold text-[#6F6051] mb-2 text-center">Sustaining Momentum for Long-Term Excellence</h2>
+                <p class="text-center text-[#8D7B68] max-w-3xl mx-auto mb-8">
+                    This 20-hour prep is a powerful start, but achieving a 9.5 CGPA is a marathon. Extend these principles throughout the semester to build a compounding effect of knowledge and ensure your success.
+                </p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                    <div class="bg-[#FDFBF8] p-6 rounded-lg">
+                        <div class="text-4xl mb-2">🎯</div>
+                        <h3 class="font-bold text-lg text-[#6F6051] mb-2">Apply the 80/20 Rule</h3>
+                        <p class="text-[#8D7B68] text-sm">Continuously identify the core concepts in each lecture that unlock the rest of the material and master them first.</p>
+                    </div>
+                    <div class="bg-[#FDFBF8] p-6 rounded-lg">
+                        <div class="text-4xl mb-2">🤸</div>
+                        <h3 class="font-bold text-lg text-[#6F6051] mb-2">Embrace Active Learning</h3>
+                        <p class="text-[#8D7B68] text-sm">Watching lectures is passive. True learning happens by doing. Build small projects and solve all practice problems.</p>
+                    </div>
+                    <div class="bg-[#FDFBF8] p-6 rounded-lg">
+                        <div class="text-4xl mb-2">🤝</div>
+                        <h3 class="font-bold text-lg text-[#6F6051] mb-2">Leverage Resources</h3>
+                        <p class="text-[#8D7B68] text-sm">Your professors, TAs, and peers are your greatest assets. Attend office hours and form study groups with motivated classmates.</p>
+                    </div>
+                    <div class="bg-[#FDFBF8] p-6 rounded-lg">
+                        <div class="text-4xl mb-2">🗓️</div>
+                        <h3 class="font-bold text-lg text-[#6F6051] mb-2">Prioritize Consistency</h3>
+                        <p class="text-[#8D7B68] text-sm">A high CGPA requires disciplined, daily effort, not last-minute cramming. Engage with your subjects every day.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-12 text-[#A4907C]">
+            <p>Built to empower your academic journey at IIT Patna. Good luck!</p>
+        </footer>
+    </div>
+
+    <script>
+        // Data
+        const allocationData = {
+            labels: ['Mathematics-1 (8h)', 'Foundations of CS (8h)', 'Data Analytics (2h)', 'English (2h)'],
+            datasets: [{
+                data: [8, 8, 2, 2],
+                backgroundColor: ['#8D7B68', '#A4907C', '#C8B6A6', '#EAE3D9'],
+                borderColor: '#FDFBF8',
+                borderWidth: 4,
+                hoverOffset: 8
+            }]
+        };
+
+        const scheduleData = {
+            '1': [
+                { time: '9:00 - 10:30', subject: 'Foundations of CS', goal: 'Set up Pro Dev Environment', details: 'Install Python, VS Code, extensions. Create project & virtual env. Run "Hello World".', link: 'https://code.visualstudio.com/docs/python/python-tutorial' },
+                { time: '11:00 - 13:00', subject: 'Mathematics-1', goal: 'Limits and Continuity', details: 'Complete Khan Academy videos and practice exercises on limit intuition and algebraic calculation.', link: 'https://www.khanacademy.org/math/calculus-1/cs1-limits-and-continuity' },
+                { time: '14:00 - 16:00', subject: 'Foundations of CS', goal: 'Python Basics & Operators', details: 'Code along with freeCodeCamp (Ch 1-3) to learn variables, numbers, strings, and operators.', link: 'https://www.youtube.com/watch?v=vLqTf2b6G2I' },
+                { time: '16:15 - 17:30', subject: 'Mathematics-1', goal: 'Derivatives & Basic Rules', details: 'Focus on power, product, and quotient rules in Khan Academy (Unit 2).', link: 'https://www.khanacademy.org/math/calculus-1/cs1-derivatives-definition-and-basic-rules' }
+            ],
+            '2': [
+                { time: '9:00 - 11:00', subject: 'Foundations of CS', goal: 'Python Lists & Dictionaries', details: 'Code along with freeCodeCamp (Ch 4, 6, 7) for core data structures.', link: 'https://www.youtube.com/watch?v=vLqTf2b6G2I' },
+                { time: '11:15 - 13:00', subject: 'Mathematics-1', goal: 'Chain Rule & Probability', details: '1h on Chain Rule (Unit 3), 45m on Permutations/Combinations.', link: 'https://www.khanacademy.org/math/calculus-1/cs1-derivatives-chain-rule-and-advanced' },
+                { time: '14:00 - 16:00', subject: 'Foundations of CS', goal: 'Python Loops & Functions', details: 'Code along with freeCodeCamp (Ch 8, 9) to master for/while loops and functions.', link: 'https://www.youtube.com/watch?v=vLqTf2b6G2I' },
+                { time: '16:15 - 17:15', subject: 'English', goal: 'Grammar: S-V Agreement & Tenses', details: 'Watch videos and complete practice exercises on Khan Academy.', link: 'https://www.khanacademy.org/humanities/grammar' }
+            ],
+            '3': [
+                { time: '9:00 - 10:30', subject: 'Mathematics-1', goal: 'Conditional Probability', details: 'Focus on later sections of the Khan Academy probability unit.', link: 'https://www.khanacademy.org/math/statistics-probability/probability-library' },
+                { time: '10:45 - 12:45', subject: 'Data Analytics', goal: 'Understand the Data Lifecycle', details: 'Read handbook intro, watch a lifecycle video, and map syllabus terms to the model.', link: 'https://jakevdp.github.io/PythonDataScienceHandbook/' },
+                { time: '14:00 - 15:00', subject: 'English', goal: 'Grammar: Voice & Common Errors', details: 'Watch videos and complete practice exercises on Khan Academy.', link: 'https://www.khanacademy.org/humanities/grammar' },
+                { time: '15:15 - 17:30', subject: 'Review & Solidify', goal: 'Free-form Practice', details: 'Revisit the most challenging topic. Rework examples or try writing a more complex Python script.', link: '#' }
+            ]
+        };
+
+        const subjectDetails = {
+            math: {
+                title: '🧮 Mathematics-1: Bridging Foundational Gaps (8 Hours)',
+                content: `
+                    <p class="mb-4">The syllabus builds on single-variable calculus and basic probability. Given self-assessed weakness, these are high-priority targets.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-md text-[#6F6051]">Focus 1: Mastering Single-Variable Calculus (5h)</h4>
+                            <p class="text-sm text-[#8D7B68]">Goal: Gain a strong, intuitive understanding of limits, continuity, and derivatives to prepare for multivariable topics.</p>
+                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
+                                <li><strong>Limits & Continuity (2h):</strong> Work through Khan Academy's Unit 1.</li>
+                                <li><strong>Derivatives & Basic Rules (2h):</strong> Proceed to Unit 2, focusing on power, product, and quotient rules.</li>
+                                <li><strong>The Chain Rule (1h):</strong> Dedicate a full hour to Unit 3. This is a critical differentiation technique.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-md text-[#6F6051]">Focus 2: Rebuilding Core Probability (3h)</h4>
+                            <p class="text-sm text-[#8D7B68]">Goal: Rebuild the foundation required for the axiomatic approach to probability taught in the course.</p>
+                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
+                                <li><strong>Fundamentals & Combinatorics (1.5h):</strong> Start with Khan Academy's Unit 8 on counting.</li>
+                                <li><strong>Conditional Probability & Independence (1.5h):</strong> Focus intensely on these topics in Unit 7.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            cs: {
+                title: '💻 Foundations of CS: From Zero to First Program (8 Hours)',
+                content: `
+                    <p class="mb-4">This course is the linchpin. Practical coding ability from day one is a significant advantage due to the weekly 3-hour lab.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-bold text-md text-[#6F6051]">Focus 1: Professional Dev Environment Setup (1.5h)</h4>
+                            <p class="text-sm text-[#8D7B68]">Goal: Install and configure Python and VS Code. A correct setup is a non-negotiable first step.</p>
+                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
+                                <li>Install Python from python.org (add to PATH).</li>
+                                <li>Install VS Code from code.visualstudio.com.</li>
+                                <li>Install the official Python extension in VS Code.</li>
+                                <li>Create a project folder and a virtual environment ('Venv').</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-md text-[#6F6051]">Focus 2: Python Programming Fundamentals (6.5h)</h4>
+                            <p class="text-sm text-[#8D7B68]">Goal: Learn basic syntax to write simple scripts and follow along in the first few labs using freeCodeCamp's YouTube course.</p>
+                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
+                                <li><strong>Basics & Operators (1.5h):</strong> Variables, data types, arithmetic/logical operators.</li>
+                                <li><strong>Data Structures (2.5h):</strong> Strings, lists, and dictionaries.</li>
+                                <li><strong>Loops & Functions (2.5h):</strong> ` + "`for`" + `/` + "`while`" + ` loops and defining functions.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            da: {
+                title: '📊 Data Analytics: A Glimpse into the Discipline (2 Hours)',
+                content: `
+                    <p class="mb-4">Since practical skills depend on Python, the goal here is to build a high-level mental model of the data analytics process. This will provide valuable context for your first lectures.</p>
+                    <div class="space-y-4">
+                         <div>
+                            <h4 class="font-bold text-md text-[#6F6051]">Action Plan</h4>
+                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
+                                <li>Read the "Preface" and "Chapter 1" of the free online "Python Data Science Handbook" by Jake Vanderplas.</li>
+                                <li>Watch a short (10-15 min) YouTube video on the "Data Science Lifecycle" or "Data Analytics Workflow".</li>
+                                <li>Review your course syllabus again and map the terms (e.g., "data cleaning", "normalization") to the lifecycle model you just learned. This will solidify your conceptual understanding.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            eng: {
+                title: '✍️ English: Polishing Communication Skills (2 Hours)',
+                content: `
+                    <p class="mb-4">Communication is a core engineering competency. Acing this course is vital for a high CGPA, as it impacts grades in all subjects. This is a strategic investment to patch common grammatical weaknesses.</p>
+                    <div class="space-y-4">
+                         <div>
+                            <h4 class="font-bold text-md text-[#6F6051]">Action Plan: Rapid Grammar Review</h4>
+                            <p class="text-sm text-[#8D7B68]">Use Khan Academy's Grammar course to review topics from Unit 2 of your syllabus.</p>
+                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
+                                <li><strong>Subject-Verb Agreement (30 mins):</strong> Review rules and take a quiz.</li>
+                                <li><strong>Tenses (30 mins):</strong> Focus on simple past, present perfect, and future.</li>
+                                <li><strong>Active vs. Passive Voice (30 mins):</strong> Understand when and why to use each.</li>
+                                <li><strong>Common Errors (30 mins):</strong> Review articles, prepositions, and sentence fragments.</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // Chart.js Initialization
+        const ctx = document.getElementById('allocationChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: allocationData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#4A4A4A',
+                            font: {
+                                size: 12,
+                                family: 'Inter'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#6F6051',
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 8
+                    }
+                }
+            }
+        });
+
+        // Schedule Logic
+        const scheduleContainer = document.getElementById('scheduleContainer');
+        const dayButtons = document.querySelectorAll('.day-btn');
+
+        function displaySchedule(day) {
+            scheduleContainer.innerHTML = '';
+            scheduleData[day].forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-[#FDFBF8] p-4 rounded-lg shadow-sm card-enter';
+                card.innerHTML = `
+                    <p class="text-sm font-semibold text-[#A4907C]">${item.time}</p>
+                    <h4 class="font-bold text-lg text-[#6F6051]">${item.subject}</h4>
+                    <p class="font-medium text-[#8D7B68] mb-2">${item.goal}</p>
+                    <p class="text-sm text-[#4A4A4A] mb-3">${item.details}</p>
+                    <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-[#8D7B68] hover:text-[#6F6051] transition-colors">Go to Resource →</a>
+                `;
+                scheduleContainer.appendChild(card);
+            });
+
+            dayButtons.forEach(btn => {
+                if (btn.dataset.day === day) {
+                    btn.classList.add('day-btn-active');
+                    btn.classList.remove('day-btn-inactive');
+                } else {
+                    btn.classList.add('day-btn-inactive');
+                    btn.classList.remove('day-btn-active');
+                }
+            });
+        }
+
+        dayButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                displaySchedule(button.dataset.day);
+            });
+        });
+
+        // Subject Deep Dive Logic
+        const subjectContent = document.getElementById('subjectContent');
+        const subjectTabs = document.querySelectorAll('.subject-tab');
+
+        function displaySubject(subject) {
+            const details = subjectDetails[subject];
+            subjectContent.innerHTML = `
+                <h3 class="font-bold text-xl text-[#6F6051] mb-4">${details.title}</h3>
+                <div class="card-enter">${details.content}</div>
+            `;
+
+            subjectTabs.forEach(tab => {
+                if (tab.dataset.subject === subject) {
+                    tab.classList.add('tab-active');
+                    tab.classList.remove('tab-inactive');
+                } else {
+                    tab.classList.add('tab-inactive');
+                    tab.classList.remove('tab-active');
+                }
+            });
+        }
+
+        subjectTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                displaySubject(tab.dataset.subject);
+            });
+        });
+
+        // Initial state
+        displaySchedule('1');
+        displaySubject('math');
+    </script>
+</body>
+</html>

@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+  
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -55,6 +55,42 @@
             .chart-container {
                 height: 350px;
             }
+        }
+        .libutton {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          padding: 7px;
+          text-align: center;
+          outline: none;
+          text-decoration: none !important;
+          color: #ffffff !important;
+          width: 200px;
+          height: 32px;
+          border-radius: 16px;
+          background-color: #0A66C2;
+          font-family: "SF Pro Text", Helvetica, sans-serif;
+          font-size: 14px;
+          white-space: nowrap;
+          transition: background-color 0.3s;
+        }
+        .libutton:hover {
+            background-color: #004182;
+        }
+        /* Spinner for loading animation */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #A4907C;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -113,7 +149,7 @@
             <section id="subjects" class="mb-16 p-6 md:p-8 bg-white rounded-2xl shadow-lg">
                 <h2 class="text-3xl font-bold text-[#6F6051] mb-2 text-center">Subject-Specific Prerequisite Deep Dive</h2>
                  <p class="text-center text-[#8D7B68] max-w-3xl mx-auto mb-8">
-                    Here is a granular, actionable plan for each course. Click on a subject to view the curated resources and specific learning goals to bridge any foundational gaps.
+                    Here is a granular, actionable plan for each course, now enhanced with AI tools. Click on a subject to view resources and use the AI assistant to deepen your understanding.
                 </p>
                 <div class="flex flex-wrap justify-center gap-2 mb-8">
                     <button class="subject-tab px-4 py-2 rounded-lg font-medium transition-colors duration-300" data-subject="math">🧮 Mathematics-1</button>
@@ -123,6 +159,18 @@
                 </div>
                 <div id="subjectContent" class="bg-[#FDFBF8] p-6 rounded-lg min-h-[300px]">
                     <!-- Subject content will be injected here by JS -->
+                </div>
+                <!-- Gemini API Output Container -->
+                <div id="geminiOutputContainer" class="mt-6 p-6 bg-[#EAE3D9] rounded-lg shadow-inner hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-lg text-[#6F6051]">✨ AI Assistant Response</h4>
+                        <button id="closeGeminiOutput" class="text-2xl font-bold text-[#8D7B68] hover:text-[#6F6051]">&times;</button>
+                    </div>
+                    <div id="geminiLoading" class="text-center hidden">
+                        <div class="loader"></div>
+                        <p class="text-[#8D7B68]">Generating response...</p>
+                    </div>
+                    <div id="geminiResponse" class="text-[#4A4A4A] whitespace-pre-wrap prose max-w-none"></div>
                 </div>
             </section>
             
@@ -157,8 +205,16 @@
             </section>
         </main>
 
-        <footer class="text-center mt-12 text-[#A4907C]">
-            <p>Built to empower your academic journey at IIT Patna. Good luck!</p>
+        <footer class="mt-16 py-8 border-t border-[#EAE3D9]">
+            <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+                <p class="text-sm text-[#8D7B68] text-center md:text-left">
+                    Made with <span class="text-red-500">❤️</span> by Sayeed. Researched and drafted by Gemini 2.5 Pro.
+                </p>
+                <div class="flex items-center flex-col sm:flex-row gap-4">
+                    <a href="https://github.com/SAYEEDHERE?tab=repositories" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-[#8D7B68] hover:text-[#6F6051] transition-colors">GitHub Profile</a>
+                    <a class="libutton" href="https://www.linkedin.com/comm/mynetwork/discovery-see-all?usecase=PEOPLE_FOLLOWS&followMember=sayeed-here" target="_blank">Follow on LinkedIn</a>
+                </div>
+            </div>
         </footer>
     </div>
 
@@ -199,89 +255,23 @@
         const subjectDetails = {
             math: {
                 title: '🧮 Mathematics-1: Bridging Foundational Gaps (8 Hours)',
-                content: `
-                    <p class="mb-4">The syllabus builds on single-variable calculus and basic probability. Given self-assessed weakness, these are high-priority targets.</p>
-                    <div class="space-y-4">
-                        <div>
-                            <h4 class="font-bold text-md text-[#6F6051]">Focus 1: Mastering Single-Variable Calculus (5h)</h4>
-                            <p class="text-sm text-[#8D7B68]">Goal: Gain a strong, intuitive understanding of limits, continuity, and derivatives to prepare for multivariable topics.</p>
-                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
-                                <li><strong>Limits & Continuity (2h):</strong> Work through Khan Academy's Unit 1.</li>
-                                <li><strong>Derivatives & Basic Rules (2h):</strong> Proceed to Unit 2, focusing on power, product, and quotient rules.</li>
-                                <li><strong>The Chain Rule (1h):</strong> Dedicate a full hour to Unit 3. This is a critical differentiation technique.</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-md text-[#6F6051]">Focus 2: Rebuilding Core Probability (3h)</h4>
-                            <p class="text-sm text-[#8D7B68]">Goal: Rebuild the foundation required for the axiomatic approach to probability taught in the course.</p>
-                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
-                                <li><strong>Fundamentals & Combinatorics (1.5h):</strong> Start with Khan Academy's Unit 8 on counting.</li>
-                                <li><strong>Conditional Probability & Independence (1.5h):</strong> Focus intensely on these topics in Unit 7.</li>
-                            </ul>
-                        </div>
-                    </div>
-                `
+                content: `<p class="mb-4">The syllabus builds on single-variable calculus and basic probability. Given self-assessed weakness, these are high-priority targets.</p>`,
+                topics: ['Limits and Continuity', 'Derivatives & Basic Rules', 'The Chain Rule', 'Conditional Probability']
             },
             cs: {
                 title: '💻 Foundations of CS: From Zero to First Program (8 Hours)',
-                content: `
-                    <p class="mb-4">This course is the linchpin. Practical coding ability from day one is a significant advantage due to the weekly 3-hour lab.</p>
-                    <div class="space-y-4">
-                        <div>
-                            <h4 class="font-bold text-md text-[#6F6051]">Focus 1: Professional Dev Environment Setup (1.5h)</h4>
-                            <p class="text-sm text-[#8D7B68]">Goal: Install and configure Python and VS Code. A correct setup is a non-negotiable first step.</p>
-                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
-                                <li>Install Python from python.org (add to PATH).</li>
-                                <li>Install VS Code from code.visualstudio.com.</li>
-                                <li>Install the official Python extension in VS Code.</li>
-                                <li>Create a project folder and a virtual environment ('Venv').</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-md text-[#6F6051]">Focus 2: Python Programming Fundamentals (6.5h)</h4>
-                            <p class="text-sm text-[#8D7B68]">Goal: Learn basic syntax to write simple scripts and follow along in the first few labs using freeCodeCamp's YouTube course.</p>
-                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
-                                <li><strong>Basics & Operators (1.5h):</strong> Variables, data types, arithmetic/logical operators.</li>
-                                <li><strong>Data Structures (2.5h):</strong> Strings, lists, and dictionaries.</li>
-                                <li><strong>Loops & Functions (2.5h):</strong> ` + "`for`" + `/` + "`while`" + ` loops and defining functions.</li>
-                            </ul>
-                        </div>
-                    </div>
-                `
+                content: `<p class="mb-4">This course is the linchpin. Practical coding ability from day one is a significant advantage due to the weekly 3-hour lab.</p>`,
+                topics: ['Python Variables & Data Types', 'Python Lists & Dictionaries', 'Python Loops', 'Python Functions']
             },
             da: {
                 title: '📊 Data Analytics: A Glimpse into the Discipline (2 Hours)',
-                content: `
-                    <p class="mb-4">Since practical skills depend on Python, the goal here is to build a high-level mental model of the data analytics process. This will provide valuable context for your first lectures.</p>
-                    <div class="space-y-4">
-                         <div>
-                            <h4 class="font-bold text-md text-[#6F6051]">Action Plan</h4>
-                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
-                                <li>Read the "Preface" and "Chapter 1" of the free online "Python Data Science Handbook" by Jake Vanderplas.</li>
-                                <li>Watch a short (10-15 min) YouTube video on the "Data Science Lifecycle" or "Data Analytics Workflow".</li>
-                                <li>Review your course syllabus again and map the terms (e.g., "data cleaning", "normalization") to the lifecycle model you just learned. This will solidify your conceptual understanding.</li>
-                            </ul>
-                        </div>
-                    </div>
-                `
+                content: `<p class="mb-4">Since practical skills depend on Python, the goal here is to build a high-level mental model of the data analytics process. This will provide valuable context for your first lectures.</p>`,
+                topics: ['The Data Lifecycle', 'Data Cleaning', 'Data Normalization', 'Exploratory Data Analysis (EDA)']
             },
             eng: {
                 title: '✍️ English: Polishing Communication Skills (2 Hours)',
-                content: `
-                    <p class="mb-4">Communication is a core engineering competency. Acing this course is vital for a high CGPA, as it impacts grades in all subjects. This is a strategic investment to patch common grammatical weaknesses.</p>
-                    <div class="space-y-4">
-                         <div>
-                            <h4 class="font-bold text-md text-[#6F6051]">Action Plan: Rapid Grammar Review</h4>
-                            <p class="text-sm text-[#8D7B68]">Use Khan Academy's Grammar course to review topics from Unit 2 of your syllabus.</p>
-                            <ul class="list-disc list-inside text-sm text-[#8D7B68] mt-2 space-y-1">
-                                <li><strong>Subject-Verb Agreement (30 mins):</strong> Review rules and take a quiz.</li>
-                                <li><strong>Tenses (30 mins):</strong> Focus on simple past, present perfect, and future.</li>
-                                <li><strong>Active vs. Passive Voice (30 mins):</strong> Understand when and why to use each.</li>
-                                <li><strong>Common Errors (30 mins):</strong> Review articles, prepositions, and sentence fragments.</li>
-                            </ul>
-                        </div>
-                    </div>
-                `
+                content: `<p class="mb-4">Communication is a core engineering competency. Acing this course is vital for a high CGPA, as it impacts grades in all subjects. This is a strategic investment to patch common grammatical weaknesses.</p>`,
+                topics: ['Subject-Verb Agreement', 'Active vs. Passive Voice', 'Verb Tenses', 'Common Grammatical Errors']
             }
         };
 
@@ -297,21 +287,9 @@
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: {
-                            color: '#4A4A4A',
-                            font: {
-                                size: 12,
-                                family: 'Inter'
-                            }
-                        }
+                        labels: { color: '#4A4A4A', font: { size: 12, family: 'Inter' } }
                     },
-                    tooltip: {
-                        backgroundColor: '#6F6051',
-                        titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 12 },
-                        padding: 10,
-                        cornerRadius: 8
-                    }
+                    tooltip: { backgroundColor: '#6F6051', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 12 }, padding: 10, cornerRadius: 8 }
                 }
             }
         });
@@ -334,23 +312,13 @@
                 `;
                 scheduleContainer.appendChild(card);
             });
-
             dayButtons.forEach(btn => {
-                if (btn.dataset.day === day) {
-                    btn.classList.add('day-btn-active');
-                    btn.classList.remove('day-btn-inactive');
-                } else {
-                    btn.classList.add('day-btn-inactive');
-                    btn.classList.remove('day-btn-active');
-                }
+                btn.classList.toggle('day-btn-active', btn.dataset.day === day);
+                btn.classList.toggle('day-btn-inactive', btn.dataset.day !== day);
             });
         }
 
-        dayButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                displaySchedule(button.dataset.day);
-            });
-        });
+        dayButtons.forEach(button => button.addEventListener('click', () => displaySchedule(button.dataset.day)));
 
         // Subject Deep Dive Logic
         const subjectContent = document.getElementById('subjectContent');
@@ -358,26 +326,104 @@
 
         function displaySubject(subject) {
             const details = subjectDetails[subject];
+            let topicsHTML = '';
+            if (details.topics && details.topics.length > 0) {
+                topicsHTML = `<div class="mt-6"><h4 class="font-bold text-md text-[#6F6051] mb-3">Key Topics & AI Tools</h4><ul class="space-y-2">`;
+                details.topics.forEach(topic => {
+                    topicsHTML += `
+                        <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-white rounded-md shadow-sm">
+                            <span class="text-sm text-[#4A4A4A] mb-2 sm:mb-0">${topic}</span>
+                            <div class="flex space-x-2 flex-shrink-0">
+                                <button class="gemini-btn text-xs bg-[#A4907C] text-white px-3 py-1 rounded-full hover:bg-[#8D7B68] transition-colors" data-action="explain" data-topic="${topic}">✨ Explain</button>
+                                <button class="gemini-btn text-xs bg-[#A4907C] text-white px-3 py-1 rounded-full hover:bg-[#8D7B68] transition-colors" data-action="problems" data-topic="${topic}">✨ Get Problems</button>
+                            </div>
+                        </li>`;
+                });
+                topicsHTML += '</ul></div>';
+            }
             subjectContent.innerHTML = `
                 <h3 class="font-bold text-xl text-[#6F6051] mb-4">${details.title}</h3>
-                <div class="card-enter">${details.content}</div>
-            `;
-
+                <div class="card-enter">${details.content}${topicsHTML}</div>`;
             subjectTabs.forEach(tab => {
-                if (tab.dataset.subject === subject) {
-                    tab.classList.add('tab-active');
-                    tab.classList.remove('tab-inactive');
-                } else {
-                    tab.classList.add('tab-inactive');
-                    tab.classList.remove('tab-active');
-                }
+                tab.classList.toggle('tab-active', tab.dataset.subject === subject);
+                tab.classList.toggle('tab-inactive', tab.dataset.subject !== subject);
             });
         }
 
-        subjectTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                displaySubject(tab.dataset.subject);
-            });
+        subjectTabs.forEach(tab => tab.addEventListener('click', () => displaySubject(tab.dataset.subject)));
+
+        // Gemini API Logic
+        const geminiOutputContainer = document.getElementById('geminiOutputContainer');
+        const geminiLoading = document.getElementById('geminiLoading');
+        const geminiResponseEl = document.getElementById('geminiResponse');
+        const closeGeminiOutputBtn = document.getElementById('closeGeminiOutput');
+
+        async function callGemini(prompt, maxRetries = 3) {
+            geminiResponseEl.innerHTML = '';
+            geminiLoading.style.display = 'block';
+            geminiOutputContainer.style.display = 'block';
+            geminiOutputContainer.scrollIntoView({ behavior: 'smooth' });
+
+            const apiKey = ""; // API key is handled by the environment.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+
+            let attempt = 0;
+            while (attempt < maxRetries) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429 || response.status >= 500) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const errorResult = await response.json();
+                        throw new Error(`API Error: ${errorResult.error?.message || 'Unknown error'}`);
+                    }
+
+                    const result = await response.json();
+                    if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        geminiResponseEl.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*/g, '<br/>&bull; ');
+                        geminiLoading.style.display = 'none';
+                        return;
+                    } else {
+                        throw new Error('Invalid response structure from Gemini API.');
+                    }
+                } catch (error) {
+                    console.error(`Attempt ${attempt + 1} failed:`, error.message);
+                    attempt++;
+                    if (attempt >= maxRetries) {
+                        geminiResponseEl.textContent = 'Sorry, I couldn\'t get a response from the AI assistant. Please try again later.';
+                        geminiLoading.style.display = 'none';
+                        break;
+                    }
+                    const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        subjectContent.addEventListener('click', function(event) {
+            if (event.target.classList.contains('gemini-btn')) {
+                const action = event.target.dataset.action;
+                const topic = event.target.dataset.topic;
+                let prompt = '';
+                if (action === 'explain') {
+                    prompt = `You are a friendly and helpful tutor. Explain the concept of "${topic}" in simple, easy-to-understand terms for a first-year university student in a Computer Science and Data Analytics program. Use analogies if helpful. Format your response clearly.`;
+                } else if (action === 'problems') {
+                    prompt = `You are a helpful teaching assistant. Generate 3 practice problems for a first-year university student on the topic of "${topic}". Provide a detailed, step-by-step solution for each problem after all the questions have been listed. Format the questions and solutions clearly.`;
+                }
+                if (prompt) callGemini(prompt);
+            }
+        });
+
+        closeGeminiOutputBtn.addEventListener('click', () => {
+            geminiOutputContainer.style.display = 'none';
         });
 
         // Initial state
